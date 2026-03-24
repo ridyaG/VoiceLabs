@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AudioDropzone from '../components/AudioDropzone';
-import { recognizeSpeech } from '../api';
+import { getApiErrorMessage, recognizeSpeech } from '../api';
 import PageHeader from '../components/PageHeader';
 
 export default function RecognizePage() {
@@ -16,7 +16,7 @@ export default function RecognizePage() {
       const { data } = await recognizeSpeech(file);
       setResult(data);
     } catch (e) {
-      setError(e.response?.data?.detail || 'Recognition failed. Please try again.');
+      setError(getApiErrorMessage(e, 'Recognition failed. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -137,6 +137,9 @@ export const submitBtn = (color, disabled) => ({
 });
 
 // Inject spinner keyframe once
-const _style = document.createElement('style');
-_style.textContent = `@keyframes spin { to { transform: rotate(360deg); } }`;
-document.head.appendChild(_style);
+if (!document.getElementById('voicelab-spin-style')) {
+  const styleEl = document.createElement('style');
+  styleEl.id = 'voicelab-spin-style';
+  styleEl.textContent = `@keyframes spin { to { transform: rotate(360deg); } }`;
+  document.head.appendChild(styleEl);
+}

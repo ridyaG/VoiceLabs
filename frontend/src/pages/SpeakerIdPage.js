@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import AudioDropzone from '../components/AudioDropzone';
 import PageHeader from '../components/PageHeader';
-import { enrollSpeaker, identifySpeaker, listSpeakers, removeSpeaker } from '../api';
-import { cardStyle, submitBtn, SectionLabel, StatPill, ErrorBox, Spinner } from './RecognizePage';
+import { enrollSpeaker, getApiErrorMessage, identifySpeaker, listSpeakers, removeSpeaker } from '../api';
+import { cardStyle, submitBtn, SectionLabel, ErrorBox, Spinner } from './RecognizePage';
 
 export default function SpeakerIdPage() {
   const [tab, setTab]           = useState('enroll'); // 'enroll' | 'identify'
@@ -30,7 +30,7 @@ export default function SpeakerIdPage() {
       setName(''); setFile(null);
       fetchSpeakers();
     } catch (e) {
-      setError(e.response?.data?.detail || 'Enrollment failed.');
+      setError(getApiErrorMessage(e, 'Enrollment failed.'));
     } finally { setLoading(false); }
   };
 
@@ -41,7 +41,7 @@ export default function SpeakerIdPage() {
       const { data } = await identifySpeaker(file);
       setResult(data);
     } catch (e) {
-      setError(e.response?.data?.detail || 'Identification failed.');
+      setError(getApiErrorMessage(e, 'Identification failed.'));
     } finally { setLoading(false); }
   };
 

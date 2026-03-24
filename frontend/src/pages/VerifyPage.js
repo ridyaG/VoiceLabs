@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AudioDropzone from '../components/AudioDropzone';
 import PageHeader from '../components/PageHeader';
-import { verifySpeaker, listSpeakers } from '../api';
+import { getApiErrorMessage, listSpeakers, verifySpeaker } from '../api';
 import { cardStyle, submitBtn, SectionLabel, ErrorBox, Spinner } from './RecognizePage';
 
 export default function VerifyPage() {
@@ -24,7 +24,7 @@ export default function VerifyPage() {
       const { data } = await verifySpeaker(file, name);
       setResult(data);
     } catch (e) {
-      setError(e.response?.data?.detail || 'Verification failed.');
+      setError(getApiErrorMessage(e, 'Verification failed.'));
     } finally { setLoading(false); }
   };
 

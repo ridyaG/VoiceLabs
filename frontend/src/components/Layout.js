@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Outlet, NavLink } from 'react-router-dom';
+
+import { healthCheck } from '../api';
 
 
 const NAV_ITEMS = [
@@ -12,7 +14,23 @@ const NAV_ITEMS = [
 
 export default function Layout() {
   const [collapsed, setCollapsed] = useState(false);
-  const location = useLocation();
+  const [apiStatus, setApiStatus] = useState('checking');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    healthCheck()
+      .then(() => {
+        if (!cancelled) setApiStatus('online');
+      })
+      .catch(() => {
+        if (!cancelled) setApiStatus('offline');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className={`layout ${collapsed ? 'collapsed' : ''}`}>
@@ -46,8 +64,8 @@ export default function Layout() {
         <div className="sidebar-footer">
           {!collapsed && (
             <div className="version-badge">
-              <span className="dot" />
-              API ONLINE
+              <span className={`dot ${apiStatus}`} />
+              API {apiStatus.toUpperCase()}
             </div>
           )}
         </div>
@@ -171,16 +189,21 @@ export default function Layout() {
           align-items: center;
           gap: 8px;
           font-size: 11px;
-          color: var(--success);
+          color: var(--text-dim);
           letter-spacing: 1px;
         }
         .dot {
           width: 7px; height: 7px;
           border-radius: 50%;
-          background: var(--success);
-          animation: pulse-glow 2s infinite;
+          background: var(--text-dim);
           flex-shrink: 0;
         }
+        .dot.online {
+          background: var(--success);
+          animation: pulse-glow 2s infinite;
+        }
+        .dot.offline { background: var(--accent3); }
+        .dot.checking { background: var(--warn); }
         .main-content {
           flex: 1;
           min-width: 0;

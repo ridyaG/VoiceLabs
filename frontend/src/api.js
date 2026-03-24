@@ -11,6 +11,7 @@ function audioForm(file, extra = {}) {
   return fd;
 }
 
+export const healthCheck       = ()                  => api.get('/health');
 export const recognizeSpeech   = (file)              => api.post('/api/recognize',              audioForm(file));
 export const enrollSpeaker     = (file, name)        => api.post('/api/speaker-id/enroll',      audioForm(file, { speaker_name: name }));
 export const identifySpeaker   = (file)              => api.post('/api/speaker-id/identify',    audioForm(file));
@@ -18,3 +19,7 @@ export const listSpeakers      = ()                  => api.get('/api/speaker-id
 export const removeSpeaker     = (name)              => api.delete(`/api/speaker-id/speakers/${name}`);
 export const verifySpeaker     = (file, name)        => api.post('/api/verify',                 audioForm(file, { speaker_name: name }));
 export const detectEmotion     = (file)              => api.post('/api/emotion',                audioForm(file));
+
+export function getApiErrorMessage(error, fallback) {
+  return error?.response?.data?.detail || fallback;
+}

@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function AudioDropzone({ onFile, accept = '.wav,.mp3,.ogg,.flac,.m4a', label = 'Drop audio file here' }) {
   const [dragging, setDragging] = useState(false);
@@ -24,6 +24,20 @@ export default function AudioDropzone({ onFile, accept = '.wav,.mp3,.ogg,.flac,.
     const f = e.dataTransfer.files[0];
     if (f) handleFile(f);
   }, [handleFile]);
+
+  const resetRecordingResources = useCallback(() => {
+    processorRef.current?.disconnect();
+    sourceRef.current?.disconnect();
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    audioContextRef.current?.close();
+
+    processorRef.current = null;
+    sourceRef.current = null;
+    streamRef.current = null;
+    audioContextRef.current = null;
+  }, []);
+
+  useEffect(() => () => resetRecordingResources(), [resetRecordingResources]);
 
   const startRec = async () => {
     try {
@@ -59,19 +73,14 @@ export default function AudioDropzone({ onFile, accept = '.wav,.mp3,.ogg,.flac,.
   };
 
   const stopRec = () => {
-    processorRef.current?.disconnect();
-    sourceRef.current?.disconnect();
-    streamRef.current?.getTracks().forEach((track) => track.stop());
-    audioContextRef.current?.close();
+    resetRecordingResources();
 
-    const wavBlob = encodeWav(chunksRef.current, sampleRateRef.current);
-    const recordedFile = new File([wavBlob], 'recording.wav', { type: 'audio/wav' });
-    handleFile(recordedFile);
+    if (chunksRef.current.length > 0) {
+      const wavBlob = encodeWav(chunksRef.current, sampleRateRef.current);
+      const recordedFile = new File([wavBlob], 'recording.wav', { type: 'audio/wav' });
+      handleFile(recordedFile);
+    }
 
-    processorRef.current = null;
-    sourceRef.current = null;
-    streamRef.current = null;
-    audioContextRef.current = null;
     chunksRef.current = [];
     setRecording(false);
   };

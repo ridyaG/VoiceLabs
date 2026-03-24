@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+
+import { healthCheck } from '../api';
 
 const MODULES = [
   {
@@ -46,7 +47,7 @@ export default function Home() {
   const [apiStatus, setApiStatus] = useState('checking');
 
   useEffect(() => {
-    axios.get('/health')
+    healthCheck()
       .then(() => setApiStatus('online'))
       .catch(() => setApiStatus('offline'));
   }, []);

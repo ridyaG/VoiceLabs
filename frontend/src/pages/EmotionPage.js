@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AudioDropzone from '../components/AudioDropzone';
 import PageHeader from '../components/PageHeader';
-import { detectEmotion } from '../api';
+import { detectEmotion, getApiErrorMessage } from '../api';
 import { cardStyle, submitBtn, SectionLabel, ErrorBox, Spinner } from './RecognizePage';
 
 export default function EmotionPage() {
@@ -18,7 +18,7 @@ export default function EmotionPage() {
       const { data } = await detectEmotion(file);
       setResult(data);
     } catch (e) {
-      setError(e.response?.data?.detail || 'Emotion detection failed.');
+      setError(getApiErrorMessage(e, 'Emotion detection failed.'));
     } finally { setLoading(false); }
   };
 
