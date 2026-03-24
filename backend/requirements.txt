@@ -1,0 +1,9 @@
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+SpeechRecognition==3.10.1
+librosa==0.10.1
+numpy==1.26.4
+scikit-learn==1.4.1.post1
+soundfile==0.12.1
+audioread==3.0.1

@@ -1,0 +1,27 @@
+services:
+  # ── Backend API ────────────────────────────────────────────────────────────────
+  - type: web
+    name: voicelab-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 8000
+
+  # ── Frontend ───────────────────────────────────────────────────────────────────
+  - type: web
+    name: voicelab-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          name: voicelab-api
+          type: web
+          property: host
+          format: https://{host}
